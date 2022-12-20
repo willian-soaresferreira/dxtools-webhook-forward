@@ -1,6 +1,7 @@
 const axios = require("axios");
 const express = require("express");
 const cors = require("cors");
+const dateFns = require("date-fns");
 
 const app = express();
 const port = 3546;
@@ -30,12 +31,20 @@ app.all("/*", async (req, res) => {
     });
   }
 
+  const paramsArray = Object.entries(queryParams);
+  const filteredParams = Object.fromEntries(
+    paramsArray.filter(
+      ([key, value]) =>
+        !key.match(/^(forwardRequestUrl|forwardRequestHeaders)$/)
+    )
+  );
+
   const forwardResponse = await axios
     .request({
       url: forwardRequestUrl.replace(`/staging`, ""), // TODO: remove this replace,
       method,
       headers,
-      params: queryParams,
+      params: filteredParams,
       data: formData.toString() ? formData : body
     })
     .catch((err) => ({
@@ -43,6 +52,12 @@ app.all("/*", async (req, res) => {
       headers: err.response?.headers ? err.response.headers : undefined,
       data: err.response?.data || { error: err.message || err }
     }));
+
+  console.log(
+    `\x1b[90m[${dateFns.format(new Date(), "yyyy-MM-dd HH:mm:ss")}]\x1b[0m`,
+    "New webhook event. Response status:",
+    `\x1b[96m${forwardResponse.status}\x1b[0m`
+  );
 
   const responseBody =
     typeof forwardResponse.data !== "object"
@@ -56,5 +71,8 @@ app.all("/*", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`dxtools webhook forward app listening on port ${port}`);
+  console.log(
+    "\x1b[32m".concat("dxtools-webhook-forward", "\x1b[0m"),
+    "app is running! \n"
+  );
 });
