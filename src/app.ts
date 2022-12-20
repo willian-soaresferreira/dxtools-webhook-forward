@@ -1,10 +1,9 @@
 import axios from "axios";
 import express from "express";
 import cors from "cors";
-import dateFns from "date-fns";
+import { format } from "date-fns";
 
 const app = express();
-const port = 3546;
 
 app.use(express.json());
 
@@ -45,7 +44,7 @@ app.all("/*", async (req, res) => {
       method,
       headers,
       params: filteredParams,
-      data: formData.toString() ? formData : body
+      data: formData.toString() || body
     })
     .catch(err => ({
       status: err.response?.status || 500,
@@ -54,7 +53,7 @@ app.all("/*", async (req, res) => {
     }));
 
   console.log(
-    `\x1b[90m[${dateFns.format(new Date(), "yyyy-MM-dd HH:mm:ss")}]\x1b[0m`,
+    `\x1b[90m[${format(new Date(), "yyyy-MM-dd HH:mm:ss")}]\x1b[0m`,
     "New webhook event. Response status:",
     `\x1b[96m${forwardResponse.status}\x1b[0m`
   );
@@ -70,11 +69,4 @@ app.all("/*", async (req, res) => {
     .send(responseBody);
 });
 
-app.listen(port, () => {
-  console.log(
-    "\x1b[32m".concat("dxtools-webhook-forward", "\x1b[0m"),
-    "app is running! \n"
-  );
-});
-
-export default app;
+export { app };

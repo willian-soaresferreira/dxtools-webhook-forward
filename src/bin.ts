@@ -1,2 +1,2 @@
 #! /usr/bin/env node
-import "./app";
+import "./server";
