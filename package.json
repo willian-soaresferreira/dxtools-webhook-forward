@@ -19,13 +19,9 @@
   "keywords": [
     "dxtools",
     "webhook",
-    "webhook",
-    "inspect",
-    "webhook",
-    "forward",
-    "localhost",
-    "public",
-    "url"
+    "webhook inspect",
+    "webhook forward",
+    "localhost public url"
   ],
   "author": "Willian Soares Ferreira",
   "license": "MIT",
