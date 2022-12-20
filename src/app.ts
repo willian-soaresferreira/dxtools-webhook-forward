@@ -1,12 +1,13 @@
-const axios = require("axios");
-const express = require("express");
-const cors = require("cors");
-const dateFns = require("date-fns");
+import axios from "axios";
+import express from "express";
+import cors from "cors";
+import dateFns from "date-fns";
 
 const app = express();
 const port = 3546;
 
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
@@ -21,12 +22,12 @@ app.use(
 app.all("/*", async (req, res) => {
   const { method, query: queryParams, body } = req;
   const { forwardRequestUrl, forwardRequestHeaders } = queryParams;
-  const headers = JSON.parse(forwardRequestHeaders);
+  const headers = JSON.parse(forwardRequestHeaders as string);
 
-  let formData = new URLSearchParams();
+  const formData = new URLSearchParams();
 
   if (headers["content-type"] === "application/x-www-form-urlencoded") {
-    Object.keys(body).forEach((key) => {
+    Object.keys(body).forEach(key => {
       formData.append(key, body[key]);
     });
   }
@@ -34,20 +35,19 @@ app.all("/*", async (req, res) => {
   const paramsArray = Object.entries(queryParams);
   const filteredParams = Object.fromEntries(
     paramsArray.filter(
-      ([key, value]) =>
-        !key.match(/^(forwardRequestUrl|forwardRequestHeaders)$/)
+      ([key]) => !key.match(/^(forwardRequestUrl|forwardRequestHeaders)$/)
     )
   );
 
   const forwardResponse = await axios
     .request({
-      url: forwardRequestUrl.replace(`/staging`, ""), // TODO: remove this replace,
+      url: (forwardRequestUrl as string).replace("/staging", ""), // TODO: remove this replace,
       method,
       headers,
       params: filteredParams,
       data: formData.toString() ? formData : body
     })
-    .catch((err) => ({
+    .catch(err => ({
       status: err.response?.status || 500,
       headers: err.response?.headers ? err.response.headers : undefined,
       data: err.response?.data || { error: err.message || err }
@@ -76,3 +76,5 @@ app.listen(port, () => {
     "app is running! \n"
   );
 });
+
+export default app;

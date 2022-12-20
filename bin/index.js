@@ -1,4 +1,4 @@
 #! /usr/bin/env node
-const app = require("../src/app");
-
-app;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./app");
