@@ -12,14 +12,14 @@ const app = (0, express_1.default)();
 exports.app = app;
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.use((0, cors_1.default)({
-    origin: [
-        "https://www.dxtools.dev",
-        "https://development.d11q8tb9qqr2lc.amplifyapp.com",
-        "http://127.0.0.1:5173"
-    ]
-}));
+app.use((0, cors_1.default)({ origin: ["https://www.dxtools.dev"] }));
 app.all("/*", async (req, res) => {
+    const logRequestInfoToTerminal = (responseStatus) => {
+        const logDate = (0, date_fns_1.format)(new Date(), "yyyy-MM-dd HH:mm:ss");
+        const coloredLogDate = `\x1b[90m[${logDate}]\x1b[0m`;
+        const coloredLogStatus = `\x1b[96m${responseStatus}\x1b[0m`;
+        console.log(`${coloredLogDate} New webhook event. Response status: ${coloredLogStatus}`);
+    };
     const { method, query: queryParams, body } = req;
     const { forwardRequestUrl, forwardRequestHeaders } = queryParams;
     const headers = JSON.parse(forwardRequestHeaders);
@@ -47,10 +47,10 @@ app.all("/*", async (req, res) => {
             data: ((_c = err.response) === null || _c === void 0 ? void 0 : _c.data) || { error: err.message || err }
         });
     });
-    console.log(`\x1b[90m[${(0, date_fns_1.format)(new Date(), "yyyy-MM-dd HH:mm:ss")}]\x1b[0m`, "New webhook event. Response status:", `\x1b[96m${forwardResponse.status}\x1b[0m`);
     const responseBody = typeof forwardResponse.data !== "object"
         ? String(forwardResponse.data)
         : forwardResponse.data;
+    logRequestInfoToTerminal(forwardResponse.status);
     return res
         .status(forwardResponse.status)
         .header(forwardResponse.headers)
