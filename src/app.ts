@@ -25,14 +25,6 @@ app.all("/*", async (req, res) => {
   const { forwardRequestUrl, forwardRequestHeaders } = queryParams;
   const headers = JSON.parse(forwardRequestHeaders as string);
 
-  const formData = new URLSearchParams();
-
-  if (headers["content-type"] === "application/x-www-form-urlencoded") {
-    Object.keys(body).forEach(key => {
-      formData.append(key, body[key]);
-    });
-  }
-
   const paramsArray = Object.entries(queryParams);
   const filteredParams = Object.fromEntries(
     paramsArray.filter(
@@ -46,7 +38,7 @@ app.all("/*", async (req, res) => {
       method,
       headers,
       params: filteredParams,
-      data: formData.toString() || body
+      data: body
     })
     .catch(err => ({
       status: err.response?.status || 500,

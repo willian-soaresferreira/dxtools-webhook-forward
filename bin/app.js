@@ -23,12 +23,6 @@ app.all("/*", async (req, res) => {
     const { method, query: queryParams, body } = req;
     const { forwardRequestUrl, forwardRequestHeaders } = queryParams;
     const headers = JSON.parse(forwardRequestHeaders);
-    const formData = new URLSearchParams();
-    if (headers["content-type"] === "application/x-www-form-urlencoded") {
-        Object.keys(body).forEach(key => {
-            formData.append(key, body[key]);
-        });
-    }
     const paramsArray = Object.entries(queryParams);
     const filteredParams = Object.fromEntries(paramsArray.filter(([key]) => !key.match(/^(forwardRequestUrl|forwardRequestHeaders)$/)));
     const forwardResponse = await axios_1.default
@@ -37,7 +31,7 @@ app.all("/*", async (req, res) => {
         method,
         headers,
         params: filteredParams,
-        data: formData.toString() || body
+        data: body
     })
         .catch(err => {
         var _a, _b, _c;
