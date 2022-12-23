@@ -21,6 +21,7 @@ app.all("/*", async (req, res) => {
         console.log(`${coloredLogDate} New webhook event. Response status: ${coloredLogStatus}`);
     };
     const { method, query: queryParams, body } = req;
+    const { forwardRequestBody } = body;
     const { forwardRequestUrl, forwardRequestHeaders } = queryParams;
     const headers = JSON.parse(forwardRequestHeaders);
     const paramsArray = Object.entries(queryParams);
@@ -31,7 +32,7 @@ app.all("/*", async (req, res) => {
         method,
         headers,
         params: filteredParams,
-        data: body
+        data: forwardRequestBody
     })
         .catch(err => {
         var _a, _b, _c;

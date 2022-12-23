@@ -22,6 +22,7 @@ app.all("/*", async (req, res) => {
   };
 
   const { method, query: queryParams, body } = req;
+  const { forwardRequestBody } = body;
   const { forwardRequestUrl, forwardRequestHeaders } = queryParams;
   const headers = JSON.parse(forwardRequestHeaders as string);
 
@@ -38,7 +39,7 @@ app.all("/*", async (req, res) => {
       method,
       headers,
       params: filteredParams,
-      data: body
+      data: forwardRequestBody
     })
     .catch(err => ({
       status: err.response?.status || 500,
